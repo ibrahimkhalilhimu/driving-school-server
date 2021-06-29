@@ -2,6 +2,8 @@ const express = require('express')
 const MongoClient = require('mongodb').MongoClient;
 const bodyParser = require('body-parser')
 const cors = require('cors')
+const fs = require('fs-extra')
+const fileUpload = require('express-fileupload'); 
 const ObjectId = require('mongodb').ObjectId
 require('dotenv').config()
 
@@ -11,6 +13,9 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster
 const app = express()
 app.use(bodyParser.json());
 app.use(cors())
+app.use(express.static('courses'))
+app.use(fileUpload())
+
 const port = 5000
 app.get('/', (req, res) => {
   res.send('Hello World!')
@@ -28,8 +33,18 @@ client.connect(err => {
   const adminCollection = client.db("drivingSchool").collection("admin");
 
   app.post('/addCourses',(req,res)=>{
-    const courses = req.body;
-    CoursesCollection.insertOne(courses)
+    const file = req.files.file;
+    const title = req.body.title;
+    const description = req.body.description;
+    const price = req.body.price;
+    const newImg = file.data;
+    const encImg = newImg.toString('base64')
+    var image = {
+      contentType: file.mimetype,
+      size: file.size,
+      img: Buffer.from(encImg, 'base64')
+  };
+    CoursesCollection.insertOne({title,description,price,image})
     .then(result=>{
       res.send(result.insertedCount>0)
     })
