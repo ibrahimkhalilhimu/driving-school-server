@@ -125,6 +125,15 @@ client.connect(err => {
     
   })
 
+  app.delete('/deleteCourse/:id',(req,res)=>{
+    CoursesCollection.deleteOne({_id:ObjectId(req.params.id)})
+    .then((result)=>{
+      console.log(result.deletedCount > 0);
+       res.send(result.deletedCount > 0);
+    })
+    
+  })
+
 
 });
 
