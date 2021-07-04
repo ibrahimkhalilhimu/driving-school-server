@@ -142,6 +142,27 @@ client.connect(err => {
   })
 
 
+  app.patch('/statusUpdate/:id', (req, res) => {
+    console.log(req.body);
+    console.log(req.params.id);
+    orderCollection.updateOne(
+      { _id: ObjectId(req.params.id) },
+      {
+        $set: { OrderStatus
+          :req.body.status }
+      }
+    )
+      .then(result => {
+        console.log(result);
+        res.send(result.modifiedCount > 0)
+      })
+      .catch(err => console.log(err))
+
+
+  })
+
+
+
 
 });
 
