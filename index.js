@@ -33,20 +33,11 @@ client.connect(err => {
   const adminCollection = client.db("drivingSchool").collection("admin");
 
   app.post('/addCourses',(req,res)=>{
-    const file = req.files.file;
-    const title = req.body.title;
-    const description = req.body.description;
-    const price = req.body.price;
-    const newImg = file.data;
-    const encImg = newImg.toString('base64')
-    var image = {
-      contentType: file.mimetype,
-      size: file.size,
-      img: Buffer.from(encImg, 'base64')
-  };
-    CoursesCollection.insertOne({title,description,price,image})
+    const newCourse = req.body
+    CoursesCollection.insertOne(newCourse)
     .then(result=>{
       res.send(result.insertedCount>0)
+      console.log(result);
     })
   })
 
@@ -133,6 +124,23 @@ client.connect(err => {
     })
     
   })
+
+
+  app.patch('/update/:id',(req,res)=>{
+    const { title, price, description, img } = req.body
+    CoursesCollection.updateOne(
+      {_id: ObjectId(req.params.id)
+      },
+    {
+      $set: {title,description,price,img}
+    }
+    )
+    .then(result=>{
+      console.log(result);
+      res.send(result.modifiedCount >0)
+    })
+  })
+
 
 
 });
